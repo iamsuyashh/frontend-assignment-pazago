@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import type { Message } from '@/types/chat';
-import { formatTimestamp } from '@/lib/utils';
+import { formatTimestamp, parseLinksInText } from '@/lib/utils';
 
 interface MessageBubbleProps {
   message: Message;
@@ -25,6 +25,9 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
     "Tell me about weather in Tokyo?",
   ];
 
+  // Parse message content for links
+  const messageContent = parseLinksInText(message.content || '');
+
   return (
     <>
       <div className={`flex w-full mb-3 sm:mb-4 animate-fadeIn ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -39,13 +42,13 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
         >
           <div className="flex flex-col gap-1.5 sm:gap-2">
 
-            {/* Message content */}
-            <p className="text-[13px] sm:text-[15px] whitespace-pre-wrap break-words leading-relaxed tracking-wide">
-              {message.content || (message.isStreaming ? '...' : '')}
+            {/* Message content with clickable links */}
+            <div className="text-[13px] sm:text-[15px] whitespace-pre-wrap break-words leading-relaxed tracking-wide">
+              {messageContent.length > 0 ? messageContent : message.isStreaming ? '...' : ''}
               {message.isStreaming && (
                 <span className="inline-block ml-1 w-0.5 h-4 bg-current animate-pulse" />
               )}
-            </p>
+            </div>
 
             {/* Timestamp and status */}
             <div

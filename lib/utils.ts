@@ -1,3 +1,5 @@
+import React from 'react';
+
 /**
  * Combines class names into a single string, filtering out falsy values
  * Useful for conditional className composition
@@ -138,4 +140,53 @@ export function extractSuggestionsFromText(text: string): string[] {
   
   // Limit to 3 suggestions
   return [...new Set(suggestions)].slice(0, 3);
+}
+
+/**
+ * Convert text with URLs to JSX with clickable links
+ * Detects URLs in text and converts them to anchor tags
+ * @param text - The text content to parse
+ * @returns React nodes with clickable links
+ */
+export function parseLinksInText(text: string): React.ReactNode[] {
+  // URL regex pattern - matches http://, https://, and www. URLs
+  const urlPattern = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+  
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+
+  // Reset regex state
+  urlPattern.lastIndex = 0;
+
+  while ((match = urlPattern.exec(text)) !== null) {
+    // Add text before the URL
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+
+    // Add the URL as a clickable link
+    const url = match[0];
+    const href = url.startsWith('http') ? url : `https://${url}`;
+    
+    parts.push(
+      React.createElement('a', {
+        key: `link-${match.index}`,
+        href: href,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        className: 'text-blue-600 hover:text-blue-800 underline underline-offset-2 transition-colors',
+        onClick: (e: React.MouseEvent) => e.stopPropagation()
+      }, url)
+    );
+
+    lastIndex = match.index + url.length;
+  }
+
+  // Add remaining text after last URL
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : [text];
 }
