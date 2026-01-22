@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
+import ReactMarkdown from 'react-markdown';
 import type { Message } from '@/types/chat';
 import { formatTimestamp, parseLinksInText } from '@/lib/utils';
 
@@ -25,9 +26,6 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
     "Tell me about weather in Tokyo?",
   ];
 
-  // Parse message content for links
-  const messageContent = parseLinksInText(message.content || '');
-
   return (
     <>
       <div className={`flex w-full mb-3 sm:mb-4 animate-fadeIn ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -42,9 +40,42 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
         >
           <div className="flex flex-col gap-1.5 sm:gap-2">
 
-            {/* Message content with clickable links */}
-            <div className="text-[13px] sm:text-[15px] whitespace-pre-wrap break-words leading-relaxed tracking-wide">
-              {messageContent.length > 0 ? messageContent : message.isStreaming ? '...' : ''}
+            {/* Message content with Markdown rendering */}
+            <div className="text-[13px] sm:text-[15px] break-words leading-relaxed tracking-wide prose prose-sm max-w-none">
+              {isAssistant ? (
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                    em: ({ children }) => <em className="italic">{children}</em>,
+                    a: ({ href, children }) => (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline underline-offset-2 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {children}
+                      </a>
+                    ),
+                    ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                    li: ({ children }) => <li className="ml-2">{children}</li>,
+                    code: ({ children }) => (
+                      <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">
+                        {children}
+                      </code>
+                    ),
+                  }}
+                >
+                  {message.content || (message.isStreaming ? '...' : '')}
+                </ReactMarkdown>
+              ) : (
+                <span className="whitespace-pre-wrap">
+                  {parseLinksInText(message.content || '')}
+                </span>
+              )}
               {message.isStreaming && (
                 <span className="inline-block ml-1 w-0.5 h-4 bg-current animate-pulse" />
               )}

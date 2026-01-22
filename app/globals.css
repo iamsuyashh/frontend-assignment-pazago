@@ -41,6 +41,19 @@
   button, a {
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Prose styles for Markdown */
+  .prose {
+    color: inherit;
+  }
+
+  .prose strong {
+    font-weight: 600;
+  }
+
+  .prose a {
+    text-decoration: underline;
+  }
 }
 
 @layer utilities {
