@@ -1,36 +1,149 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Weather Chat Agent ���️
 
-## Getting Started
+A modern, responsive chat interface for interacting with an AI-powered weather agent. Built with Next.js 14, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+![Weather Chat Agent](https://img.shields.io/badge/Next.js-16.1.4-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?style=flat-square&logo=tailwind-css)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ��� Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [Configuration](#configuration)
+- [Deployment](#deployment)
+
+## ✨ Features
+
+### Core Features ✅
+
+- **Real-time Chat Interface** - Message input with auto-resize, user/agent message distinction, auto-scroll
+- **Streaming API Integration** - Server-Sent Events support, real-time response streaming, error handling
+- **Message Management** - Persistent chat history (localStorage), export to JSON, clear chat
+- **Responsive Design** - Mobile-first approach, works on all screen sizes (320px+)
+
+### Advanced Features ���
+
+- **Dark/Light Theme Toggle** - System preference detection, manual switching, persistent selection
+- **Search Functionality** - Real-time message search with result count
+- **Accessibility** - ARIA labels, keyboard navigation, screen reader friendly
+- **User Experience** - Smooth animations, loading indicators, sound notifications, error handling
+
+## ���️ Tech Stack
+
+- **Framework**: Next.js 16.1.4 (App Router)
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 4
+- **State Management**: React Hooks
+- **API**: Fetch API with Streaming Support
+- **Storage**: LocalStorage
+
+## ��� Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm, yarn, or pnpm
+- Modern web browser
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Configure your Thread ID in `hooks/useChat.ts`:
+   ```typescript
+   const THREAD_ID = 'YOUR_COLLEGE_ROLL_NUMBER';
+   ```
+
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000)
+
+## ��� Project Structure
+
+```
+frontendpazago/
+├── app/
+│   ├── api/
+│   │   └── chat/
+│   │       └── route.ts          # Mock API with streaming weather responses
+│   ├── favicon.ico
+│   ├── globals.css               # Global styles and animations
+│   ├── layout.tsx                # Root layout with ThemeProvider
+│   └── page.tsx                  # Main chat interface page
+├── components/
+│   ├── chat/
+│   │   ├── ChatContainer.tsx     # Main chat wrapper component
+│   │   ├── ChatHeader.tsx        # Header with theme toggle & actions
+│   │   ├── ChatInput.tsx         # Message input with auto-resize
+│   │   ├── MessageBubble.tsx     # Individual message display
+│   │   ├── MessageList.tsx       # Messages list with auto-scroll
+│   │   └── SearchBar.tsx         # Search functionality
+│   ├── providers/
+│   │   └── ThemeProvider.tsx     # Theme context provider
+│   └── ThemeToggle.tsx           # Dark/light mode toggle button
+├── hooks/
+│   ├── useChat.ts                # Chat state & API integration
+│   ├── useLocalStorage.ts        # LocalStorage persistence hook
+│   └── useTheme.ts               # Theme management hook
+├── lib/
+│   ├── constants.ts              # API config & app constants
+│   └── utils.ts                  # Utility functions (cn, formatTimestamp, etc.)
+├── types/
+│   └── chat.ts                   # TypeScript type definitions
+├── public/                       # Static assets
+├── .env.example                  # Environment variables template
+├── .gitignore                    # Git ignore rules
+├── ARCHITECTURE.md               # Architecture documentation
+├── eslint.config.mjs             # ESLint configuration
+├── next.config.ts                # Next.js configuration
+├── package.json                  # Dependencies & scripts
+├── postcss.config.mjs            # PostCSS configuration
+├── README.md                     # This file
+├── SETUP.md                      # Setup instructions
+└── tsconfig.json                 # TypeScript configuration
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚙️ Configuration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+API endpoint and parameters are in `lib/constants.ts`. Replace the THREAD_ID in `hooks/useChat.ts` with your college roll number.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### API Implementation Note
 
-## Learn More
+**Important:** The streaming API endpoint provided in the assignment could not be resolved via public DNS. The application therefore demonstrates streaming behavior using a mocked ReadableStream that mirrors the expected API response format.
 
-To learn more about Next.js, take a look at the following resources:
+The mock API (`app/api/chat/route.ts`) simulates realistic weather responses with word-by-word streaming for cities like London, Paris, Mumbai, New York, Tokyo, Sydney, and Dubai. This implementation showcases all the required functionality including:
+- Server-Sent Events (SSE) streaming
+- Real-time response display
+- Error handling
+- Loading states
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To integrate with a real API endpoint, simply replace the mock implementation in `app/api/chat/route.ts` with the actual API call.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ��� Deployment
 
-## Deploy on Vercel
+Deploy to Vercel, Netlify, or any platform supporting Next.js:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run build
+npm start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ��� Author
+
+**Your Name**
+- Roll Number: [YOUR_ROLL_NUMBER]
+- GitHub: [@yourusername]
+
+---
+
+Built with ❤️ using Next.js, TypeScript, and Tailwind CSS
