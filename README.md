@@ -161,8 +161,8 @@ The API route automatically proxies requests to the Provue AI backend, so no add
 
 ##  Author
 
-**Your Name**
-- Roll Number: [YOUR_ROLL_NUMBER]
+**Suyash Labde**
+- Roll Number: [231255]
 - GitHub: [@iamsuyashh]
 
 ---

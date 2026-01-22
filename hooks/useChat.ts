@@ -5,7 +5,7 @@ import type { Message, UseChatReturn } from '@/types/chat';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { generateId, exportToJSON, playNotificationSound, extractSuggestionsFromText } from '@/lib/utils';
 
-const THREAD_ID = 'STUDENT_2024_001'; // Replace with actual roll number
+const THREAD_ID = '231255'; // Replace with actual roll number
 
 export function useChat(): UseChatReturn {
   const [messages, setMessages] = useState<Message[]>([]);
