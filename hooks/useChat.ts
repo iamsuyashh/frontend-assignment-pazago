@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { Message, UseChatReturn, APIRequest } from '@/types/chat';
-import { DEFAULT_REQUEST_PARAMS, STORAGE_KEYS } from '@/lib/constants';
-import { generateId, exportToJSON, playNotificationSound } from '@/lib/utils';
+import type { Message, UseChatReturn } from '@/types/chat';
+import { STORAGE_KEYS } from '@/lib/constants';
+import { generateId, exportToJSON, playNotificationSound, extractSuggestionsFromText } from '@/lib/utils';
 
 const THREAD_ID = 'STUDENT_2024_001'; // Replace with actual roll number
 
@@ -49,8 +49,8 @@ export function useChat(): UseChatReturn {
   }, []);
 
   /**
-   * Process streaming response from API
-   * Handles Server-Sent Events (SSE) format and updates message content in real-time
+   * Process SSE streaming response from Provue AI API
+   * Extracts only text-delta events and builds the response
    * @param reader - ReadableStream reader for response body
    * @param messageId - ID of the message to update
    */
@@ -60,72 +60,66 @@ export function useChat(): UseChatReturn {
   ) => {
     const decoder = new TextDecoder();
     let accumulatedContent = '';
-    let buffer = ''; // Buffer for incomplete chunks
+    let buffer = '';
 
     try {
       while (true) {
         const { done, value } = await reader.read();
         
-        if (done) break;
+        if (done) {
+          console.log('Stream completed');
+          break;
+        }
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        buffer = lines.pop() || ''; // Keep incomplete line in buffer
 
         for (const line of lines) {
-          if (!line.trim() || line.startsWith(':')) continue;
-          
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6).trim();
-            
-            if (data === '[DONE]') continue;
+          if (!line.trim()) continue;
 
+          if (line.startsWith('data: ')) {
             try {
-              const parsed = JSON.parse(data);
+              const jsonStr = line.slice(6);
+              const data = JSON.parse(jsonStr);
               
-              // Handle different response formats
-              if (parsed.type === 'text' || parsed.type === 'content') {
-                const content = parsed.content || parsed.delta || parsed.text || '';
-                if (content) {
-                  accumulatedContent += content;
-                  
-                  setMessages(prev => prev.map(msg => 
-                    msg.id === messageId
-                      ? { ...msg, content: accumulatedContent, isStreaming: true }
-                      : msg
-                  ));
-                }
-              } else if (parsed.content) {
-                accumulatedContent = parsed.content;
+              // Process text-delta events
+              if (data.type === 'text-delta' && data.payload?.text) {
+                accumulatedContent += data.payload.text;
+                
                 setMessages(prev => prev.map(msg => 
                   msg.id === messageId
                     ? { ...msg, content: accumulatedContent, isStreaming: true }
                     : msg
                 ));
               }
-            } catch {
-              // If not JSON, treat as plain text
-              if (data && data !== '[DONE]') {
-                accumulatedContent += data;
-                setMessages(prev => prev.map(msg => 
-                  msg.id === messageId
-                    ? { ...msg, content: accumulatedContent, isStreaming: true }
-                    : msg
-                ));
+              
+              console.log('SSE Event:', data.type);
+              
+            } catch (parseError) {
+              if (line.includes('"type":"done"')) {
+                console.log('Stream done event received');
               }
             }
           }
         }
       }
 
-      // Finalize the message
+      // Extract suggestions from the accumulated content
+      const suggestions = extractSuggestionsFromText(accumulatedContent);
+
+      // Finalize the message with suggestions
       setMessages(prev => prev.map(msg => 
         msg.id === messageId
-          ? { ...msg, isStreaming: false, status: 'sent' }
+          ? { 
+              ...msg, 
+              isStreaming: false, 
+              status: 'sent',
+              suggestions: suggestions.length > 0 ? suggestions : undefined
+            }
           : msg
       ));
 
-      // Play notification sound
       playNotificationSound();
 
     } catch (error) {
@@ -194,25 +188,19 @@ export function useChat(): UseChatReturn {
       abortControllerRef.current = new AbortController();
 
       // Prepare API request
-      // Build conversation history - include all previous messages
-      const conversationHistory = messages
-        .filter(msg => msg.content && msg.status !== 'error')
-        .map(msg => ({ role: msg.role, content: msg.content }));
-      
-      conversationHistory.push({ role: 'user', content: trimmedContent });
-
-      const requestBody: APIRequest = {
-        ...DEFAULT_REQUEST_PARAMS,
-        messages: conversationHistory,
-        threadId: THREAD_ID
+      const requestBody = {
+        prompt: trimmedContent,
+        stream: true
       };
 
-      // Set timeout for API request (30 seconds)
+      console.log('Sending request:', requestBody);
+
+      // Set timeout for API request (60 seconds for streaming)
       const timeoutId = setTimeout(() => {
         if (abortControllerRef.current) {
           abortControllerRef.current.abort();
         }
-      }, 30000);
+      }, 60000);
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -224,6 +212,9 @@ export function useChat(): UseChatReturn {
       });
 
       clearTimeout(timeoutId);
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -277,7 +268,7 @@ export function useChat(): UseChatReturn {
       setIsLoading(false);
       abortControllerRef.current = null;
     }
-  }, [messages, isLoading, processStreamResponse]);
+  }, [isLoading, processStreamResponse]);
 
   const clearChat = useCallback(() => {
     setMessages([]);

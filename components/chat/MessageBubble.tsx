@@ -18,11 +18,8 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
   const isError = message.status === 'error';
   const isAssistant = message.role === 'assistant';
 
-  // Suggested follow-up questions for after assistant responses
-  
-
-  // City suggestions for when city is not detected or there's an error
-  const citySuggestions = [
+  // Default suggestions for errors only
+  const defaultSuggestions = [
     "What's the weather in London?",
     "How's the weather in New York?",
     "Tell me about weather in Tokyo?",
@@ -30,11 +27,7 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
 
   return (
     <>
-      <div
-        className={`flex w-full mb-3 sm:mb-4 animate-fadeIn ${
-          isUser ? 'justify-end' : 'justify-start'
-        }`}
-      >
+      <div className={`flex w-full mb-3 sm:mb-4 animate-fadeIn ${isUser ? 'justify-end' : 'justify-start'}`}>
         <div
           className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] rounded-2xl px-3.5 sm:px-4 py-2.5 sm:py-3 transition-all ${
             isUser
@@ -110,33 +103,33 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
         </div>
       </div>
 
-      {/* Suggested questions after assistant completes response */}
-      {isAssistant && !message.isStreaming && message.status === 'sent' && onPromptClick && (
+      {/* Dynamic suggestions after assistant completes response */}
+      {isAssistant && !message.isStreaming && message.status === 'sent' && message.suggestions && message.suggestions.length > 0 && onPromptClick && (
         <div className="flex justify-end mb-3 sm:mb-4 animate-fadeIn">
           <div className="max-w-full sm:max-w-full md:max-w-full flex flex-col gap-2">
-            {citySuggestions.map((question, index) => (
+            {message.suggestions.map((suggestion, index) => (
               <button
                 key={index}
-                onClick={() => onPromptClick(question)}
-                className="px-10 py-5 bg-[#F5F5F5] text-gray-700 text-xs sm:text-sm rounded-xl hover:bg-gray-200 transition-colors border border-gray-200"
+                onClick={() => onPromptClick(suggestion)}
+                className="px-10 py-5 bg-[#F5F5F5] text-gray-700 text-xs sm:text-sm rounded-xl hover:bg-gray-200 transition-colors border border-gray-200 text-left"
               >
-                {question}
+                {suggestion}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* City suggestions after error or when city not detected */}
+      {/* Default suggestions for errors */}
       {isError && onPromptClick && (
         <div className="flex justify-start mb-3 sm:mb-4 animate-fadeIn">
           <div className="max-w-[85%] sm:max-w-[75%] md:max-w-[70%] flex flex-col gap-2">
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 px-2">Try asking about these cities:</p>
-            {citySuggestions.map((suggestion, index) => (
+            <p className="text-xs text-gray-600 mb-1 px-2">Try asking about these cities:</p>
+            {defaultSuggestions.map((suggestion, index) => (
               <button
                 key={index}
                 onClick={() => onPromptClick(suggestion)}
-                className="px-4 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700 text-left"
+                className="px-4 py-3 bg-white text-gray-700 text-xs sm:text-sm rounded-xl hover:bg-gray-50 transition-colors border border-gray-200 text-left"
               >
                 {suggestion}
               </button>

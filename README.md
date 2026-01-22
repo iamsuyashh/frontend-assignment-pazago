@@ -19,22 +19,32 @@ A modern, responsive chat interface for interacting with an AI-powered weather a
 
 ### Core Features ✅
 
-- **Real-time Chat Interface** - Message input with auto-resize, user/agent message distinction, auto-scroll
-- **Streaming API Integration** - Server-Sent Events support, real-time response streaming, error handling
+- **Real-time Chat Interface** - Message input with auto-resize, user/agent message distinction, smart auto-scroll
+- **Live API Integration** - Connected to Provue AI Weather Agent with real-time streaming
+- **Server-Sent Events** - True SSE streaming for instant response updates
 - **Message Management** - Persistent chat history (localStorage), export to JSON, clear chat
 - **Responsive Design** - Mobile-first approach, works on all screen sizes (320px+)
+- **Dark/Light Theme** - Persistent theme switching with smooth transitions
 
-### API Implementation Note
+### API Integration
 
-**Important:** The streaming API endpoint provided in the assignment could not be resolved via public DNS. The application therefore demonstrates streaming behavior using a mocked ReadableStream that mirrors the expected API response format.
+The application is now integrated with the **Provue AI Weather Agent API** (`https://api-dev.provue.ai/api/webapp/agent/test-agent`). The implementation includes:
 
-The mock API (`app/api/chat/route.ts`) simulates realistic weather responses with word-by-word streaming for cities like London, Paris, Mumbai, New York, Tokyo, Sydney, and Dubai. This implementation showcases all the required functionality including:
-- Server-Sent Events (SSE) streaming
-- Real-time response display
-- Error handling
-- Loading states
+- **Real-time Streaming**: Server-Sent Events (SSE) for live response updates
+- **Direct API Proxy**: Next.js API route forwards requests to Provue AI
+- **Error Handling**: Comprehensive error handling with user-friendly messages
+- **Loading States**: Visual indicators during API calls
+- **Conversation Context**: Full message history sent with each request
 
-To integrate with a real API endpoint, simply replace the mock implementation in `app/api/chat/route.ts` with the actual API call.
+The API endpoint accepts POST requests with:
+```json
+{
+  "prompt": "What's the weather in Mumbai?",
+  "stream": true
+}
+```
+
+Responses are streamed in real-time using Server-Sent Events format.
 
 ### Advanced Features 
 
@@ -87,7 +97,7 @@ frontendpazago/
 ├── app/
 │   ├── api/
 │   │   └── chat/
-│   │       └── route.ts          # Mock API with streaming weather responses
+│   │       └── route.ts          # API proxy to Provue AI weather agent
 │   ├── favicon.ico
 │   ├── globals.css               # Global styles and animations
 │   ├── layout.tsx                # Root layout with ThemeProvider
@@ -98,6 +108,10 @@ frontendpazago/
 │   │   ├── ChatHeader.tsx        # Header with theme toggle & actions
 │   │   ├── ChatInput.tsx         # Message input with auto-resize
 │   │   ├── MessageBubble.tsx     # Individual message display
+│   │   ├── MessageList.tsx       # Message list with auto-scroll
+│   │   └── SearchBar.tsx         # Search functionality
+│   └── providers/
+│       └── ThemeProvider.tsx     # Theme context provider
 │   │   ├── MessageList.tsx       # Messages list with auto-scroll
 │   │   └── SearchBar.tsx         # Search functionality
 │  
@@ -126,11 +140,18 @@ frontendpazago/
 
 ## ⚙️ Configuration
 
-API endpoint and parameters are in `lib/constants.ts`. Replace the THREAD_ID in `hooks/useChat.ts` with your college roll number.
+The application connects to the **Provue AI Weather Agent API** at:
+```
+https://api-dev.provue.ai/api/webapp/agent/test-agent
+```
 
+API configuration is handled in `app/api/chat/route.ts`. The Thread ID can be customized in `hooks/useChat.ts`:
 
+```typescript
+const THREAD_ID = 'YOUR_COLLEGE_ROLL_NUMBER';
+```
 
-##  Deployment
+## 🚀 Deployment
 
 Deploy to Vercel, Netlify, or any platform supporting Next.js:
 
@@ -138,6 +159,8 @@ Deploy to Vercel, Netlify, or any platform supporting Next.js:
 npm run build
 npm start
 ```
+
+The API route automatically proxies requests to the Provue AI backend, so no additional environment variables are required.
 
 ##  Author
 

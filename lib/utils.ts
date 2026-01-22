@@ -85,3 +85,57 @@ export function playNotificationSound(): void {
     oscillator.stop(audioContext.currentTime + 0.3);
   }
 }
+
+/**
+ * Extract suggestions from AI response text
+ * Looks for phrases like "Let me know if..." or questions at the end
+ * @param text - The AI response text
+ * @returns Array of suggestion strings
+ */
+export function extractSuggestionsFromText(text: string): string[] {
+  const suggestions: string[] = [];
+  
+  // Pattern 1: "Let me know if you'd like X, Y, or Z"
+  const letMeKnowPattern = /Let me know if (?:you'd like|you want|you need)\s+([^.!?]+)/gi;
+  const letMeKnowMatches = text.match(letMeKnowPattern);
+  
+  if (letMeKnowMatches) {
+    letMeKnowMatches.forEach(match => {
+      // Extract the suggestions part after "Let me know if you'd like"
+      const suggestionsText = match.replace(/Let me know if (?:you'd like|you want|you need)\s+/i, '');
+      
+      // Split by common delimiters (comma, "or", "and")
+      const items = suggestionsText
+        .split(/,|\s+or\s+|\s+and\s+/i)
+        .map(item => item.trim())
+        .filter(item => item.length > 0 && item.length < 100); // Reasonable length
+      
+      // Convert to questions
+      items.forEach(item => {
+        // Remove trailing punctuation
+        const cleanItem = item.replace(/[!?.]$/, '').trim();
+        if (cleanItem) {
+          // Capitalize first letter
+          const suggestion = cleanItem.charAt(0).toUpperCase() + cleanItem.slice(1);
+          suggestions.push(`Can you provide ${suggestion}?`);
+        }
+      });
+    });
+  }
+  
+  // Pattern 2: Questions at the end (e.g., "Would you like to know more?")
+  const questionPattern = /([A-Z][^.!?]*\?)/g;
+  const questions = text.match(questionPattern);
+  
+  if (questions) {
+    questions.slice(-3).forEach(question => { // Take last 3 questions
+      const trimmed = question.trim();
+      if (trimmed.length > 10 && trimmed.length < 100) {
+        suggestions.push(trimmed);
+      }
+    });
+  }
+  
+  // Limit to 3 suggestions
+  return [...new Set(suggestions)].slice(0, 3);
+}

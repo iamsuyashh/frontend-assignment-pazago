@@ -5,6 +5,7 @@ export interface Message {
   timestamp: Date;
   status?: 'sending' | 'sent' | 'error';
   isStreaming?: boolean;
+  suggestions?: string[]; // Add suggestions field
 }
 
 export interface ChatMessage {

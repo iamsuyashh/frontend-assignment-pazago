@@ -50,9 +50,13 @@
 ### ✅ Advanced Features
 - [x] Message search functionality (with result count)
 - [x] Export chat history (JSON download)
-- [x] Dark/light theme toggle (persistent)
+- [x] Dark/light theme toggle (persistent, localStorage)
 - [x] Typing indicators (animated dots)
 - [x] Sound notifications (on message receive)
+- [x] Smart auto-scroll (with manual scroll detection)
+- [x] Scroll to bottom button (appears when scrolled up)
+- [x] City suggestions on error messages
+- [x] Suggested follow-up questions after responses
 
 ### ✅ Technical Excellence
 - [x] TypeScript implementation (100%)
@@ -69,35 +73,49 @@
 
 ## API Implementation
 
-### Mock API Features
-- [x] Recognizes multiple cities (London, Paris, Mumbai, New York, Tokyo, Sydney, Dubai)
-- [x] Realistic weather responses with detailed info
-- [x] Word-by-word streaming simulation
-- [x] Proper SSE format
-- [x] Error handling
-- [x] Fallback for unrecognized queries
+### Real API Integration ✅
+- [x] **Provue AI Weather Agent**: Connected to `https://api-dev.provue.ai/api/webapp/agent/test-agent`
+- [x] **Streaming Support**: Real-time SSE (Server-Sent Events) responses
+- [x] **Next.js API Proxy**: Server-side request forwarding for security
+- [x] **Full Conversation Context**: Sends complete message history
+- [x] **Error Handling**: Network errors, timeouts, API errors
+- [x] **Request Validation**: Message length limits, input sanitization
+- [x] **Response Processing**: Handles various SSE data formats
+- [x] **Auto-retry**: Retry failed messages with one click
 
 ## Testing
 
 ### Test These Features:
 1. **Chat Functionality**
-   - Send: "What's the weather in London?"
-   - Send: "How's Mumbai today?"
+   - Send: "What's the weather in Mumbai?"
+   - Send: "How's the weather in London?"
+   - Send: "Tell me about weather in New York"
    - Send multiple messages to verify conversation history
+   - Watch real-time streaming responses
 
 2. **Theme Toggle**
    - Click moon/sun icon in header
-   - Verify dark mode applies
+   - Verify dark mode applies across all components
    - Refresh page - theme should persist
 
 3. **Search**
    - Type in search bar
-   - Verify messages are filtered
-   - Check result count
+   - Verify messages are filtered in real-time
+   - Check result count updates
 
 4. **Export/Clear**
-   - Export chat (downloads JSON)
-   - Clear chat (shows confirmation)
+   - Export chat (downloads JSON with full history)
+   - Clear chat (shows confirmation dialog)
+
+5. **Auto-Scroll**
+   - Scroll up in message list
+   - See floating "scroll to bottom" button appear
+   - Watch auto-scroll resume on new messages
+
+6. **Error Handling**
+   - Disconnect internet and send message
+   - See city suggestions appear after error
+   - Click retry button to resend
 
 5. **Responsive**
    - Resize browser to mobile width (320px)
