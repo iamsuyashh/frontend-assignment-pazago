@@ -110,10 +110,7 @@ frontendpazago/
 │   │   ├── MessageBubble.tsx     # Individual message display
 │   │   ├── MessageList.tsx       # Message list with auto-scroll
 │   │   └── SearchBar.tsx         # Search functionality
-│   └── providers/
-│       └── ThemeProvider.tsx     # Theme context provider
-│   │   ├── MessageList.tsx       # Messages list with auto-scroll
-│   │   └── SearchBar.tsx         # Search functionality
+│   
 │  
 │   
 ├── hooks/

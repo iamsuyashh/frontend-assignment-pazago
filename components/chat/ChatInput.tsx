@@ -1,5 +1,5 @@
 'use client';
-
+import  { MoveUpRight } from 'lucide-react'
 import React, { useState, useRef, KeyboardEvent, ChangeEvent } from 'react';
 
 interface ChatInputProps {
@@ -43,12 +43,12 @@ export function ChatInput({ onSend, disabled = false, placeholder = 'Ask about t
     // Auto-resize textarea
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
     }
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white p-3 sm:p-4 animate-slideUp">
+    <div className="bg-white p-3 sm:p-4 animate-slideUp">
       <div className="max-w-4xl mx-auto">
         <div className="relative flex items-end gap-2 bg-white rounded-2xl sm:rounded-3xl border border-gray-200 focus-within:border-blue-400 focus-within:shadow-lg focus-within:shadow-blue-100 transition-all duration-300">
           <textarea
@@ -56,19 +56,19 @@ export function ChatInput({ onSend, disabled = false, placeholder = 'Ask about t
             value={input}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            placeholder={disabled ? 'Waiting for response...' : placeholder}
+            
             disabled={disabled}
             rows={1}
-            className="flex-1 bg-transparent px-4 sm:px-5 py-3 sm:py-3.5 text-gray-900 placeholder-gray-400 resize-none outline-none disabled:opacity-60 disabled:cursor-not-allowed text-sm sm:text-base leading-relaxed transition-all"
+            className="flex-1 bg-transparent px-4 sm:px-6 py-4 sm:py-15 text-gray-900 placeholder-gray-400 resize-none outline-none disabled:opacity-60 disabled:cursor-not-allowed text-sm sm:text-base leading-relaxed transition-all overflow-hidden"
             aria-label="Message input"
             aria-disabled={disabled}
-            style={{ maxHeight: '120px', minHeight: '44px' }}
+            style={{ maxHeight: '200px', minHeight: '56px' }}
           />
           
           <button
             onClick={handleSend}
             disabled={disabled || !input.trim()}
-            className="m-2 p-2.5 sm:p-3 rounded-full bg-black text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 active:scale-95"
+            className="m-2 p-2.5 sm:p-3 rounded-xl bg-black text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 active:scale-95"
             aria-label="Send message"
             title={disabled ? 'Waiting for response...' : 'Send message (Enter)'}
           >
@@ -78,19 +78,7 @@ export function ChatInput({ onSend, disabled = false, placeholder = 'Ask about t
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
             ) : (
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5"
-                fill="none"
-                strokeWidth="2.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"
-                />
-              </svg>
+              <MoveUpRight className="w-4 h-4 sm:w-5 sm:h-5" />
             )}
           </button>
         </div>
