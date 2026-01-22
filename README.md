@@ -1,4 +1,4 @@
-# Weather Chat Agent ���️
+# Weather Chat Agent ️
 
 A modern, responsive chat interface for interacting with an AI-powered weather agent. Built with Next.js 14, TypeScript, and Tailwind CSS.
 
@@ -6,7 +6,7 @@ A modern, responsive chat interface for interacting with an AI-powered weather a
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?style=flat-square&logo=tailwind-css)
 
-## ��� Table of Contents
+##  Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -24,14 +24,26 @@ A modern, responsive chat interface for interacting with an AI-powered weather a
 - **Message Management** - Persistent chat history (localStorage), export to JSON, clear chat
 - **Responsive Design** - Mobile-first approach, works on all screen sizes (320px+)
 
-### Advanced Features ���
+### API Implementation Note
+
+**Important:** The streaming API endpoint provided in the assignment could not be resolved via public DNS. The application therefore demonstrates streaming behavior using a mocked ReadableStream that mirrors the expected API response format.
+
+The mock API (`app/api/chat/route.ts`) simulates realistic weather responses with word-by-word streaming for cities like London, Paris, Mumbai, New York, Tokyo, Sydney, and Dubai. This implementation showcases all the required functionality including:
+- Server-Sent Events (SSE) streaming
+- Real-time response display
+- Error handling
+- Loading states
+
+To integrate with a real API endpoint, simply replace the mock implementation in `app/api/chat/route.ts` with the actual API call.
+
+### Advanced Features 
 
 - **Dark/Light Theme Toggle** - System preference detection, manual switching, persistent selection
 - **Search Functionality** - Real-time message search with result count
 - **Accessibility** - ARIA labels, keyboard navigation, screen reader friendly
 - **User Experience** - Smooth animations, loading indicators, sound notifications, error handling
 
-## ���️ Tech Stack
+## ️ Tech Stack
 
 - **Framework**: Next.js 16.1.4 (App Router)
 - **Language**: TypeScript 5
@@ -40,7 +52,7 @@ A modern, responsive chat interface for interacting with an AI-powered weather a
 - **API**: Fetch API with Streaming Support
 - **Storage**: LocalStorage
 
-## ��� Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -68,7 +80,7 @@ A modern, responsive chat interface for interacting with an AI-powered weather a
 
 5. Open [http://localhost:3000](http://localhost:3000)
 
-## ��� Project Structure
+##  Project Structure
 
 ```
 frontendpazago/
@@ -88,13 +100,12 @@ frontendpazago/
 │   │   ├── MessageBubble.tsx     # Individual message display
 │   │   ├── MessageList.tsx       # Messages list with auto-scroll
 │   │   └── SearchBar.tsx         # Search functionality
-│   ├── providers/
-│   │   └── ThemeProvider.tsx     # Theme context provider
-│   └── ThemeToggle.tsx           # Dark/light mode toggle button
+│  
+│   
 ├── hooks/
 │   ├── useChat.ts                # Chat state & API integration
 │   ├── useLocalStorage.ts        # LocalStorage persistence hook
-│   └── useTheme.ts               # Theme management hook
+│ 
 ├── lib/
 │   ├── constants.ts              # API config & app constants
 │   └── utils.ts                  # Utility functions (cn, formatTimestamp, etc.)
@@ -117,19 +128,9 @@ frontendpazago/
 
 API endpoint and parameters are in `lib/constants.ts`. Replace the THREAD_ID in `hooks/useChat.ts` with your college roll number.
 
-### API Implementation Note
 
-**Important:** The streaming API endpoint provided in the assignment could not be resolved via public DNS. The application therefore demonstrates streaming behavior using a mocked ReadableStream that mirrors the expected API response format.
 
-The mock API (`app/api/chat/route.ts`) simulates realistic weather responses with word-by-word streaming for cities like London, Paris, Mumbai, New York, Tokyo, Sydney, and Dubai. This implementation showcases all the required functionality including:
-- Server-Sent Events (SSE) streaming
-- Real-time response display
-- Error handling
-- Loading states
-
-To integrate with a real API endpoint, simply replace the mock implementation in `app/api/chat/route.ts` with the actual API call.
-
-## ��� Deployment
+##  Deployment
 
 Deploy to Vercel, Netlify, or any platform supporting Next.js:
 
@@ -138,11 +139,11 @@ npm run build
 npm start
 ```
 
-## ��� Author
+##  Author
 
 **Your Name**
 - Roll Number: [YOUR_ROLL_NUMBER]
-- GitHub: [@yourusername]
+- GitHub: [@iamsuyashh]
 
 ---
 
