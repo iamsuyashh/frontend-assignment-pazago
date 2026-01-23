@@ -8,13 +8,26 @@ interface MessageListProps {
   messages: Message[];
   isLoading: boolean;
   onPromptClick?: (prompt: string) => void;
+  searchQuery?: string;
+  currentSearchIndex?: number;
 }
 
-export function MessageList({ messages, isLoading, onPromptClick }: MessageListProps) {
+export function MessageList({ messages, isLoading, onPromptClick, searchQuery = '', currentSearchIndex = 0 }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
+
+  // Scroll to current search result
+  useEffect(() => {
+    if (searchQuery && messageRefs.current[currentSearchIndex]) {
+      messageRefs.current[currentSearchIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [currentSearchIndex, searchQuery]);
 
   // Check if user has scrolled up
   const handleScroll = () => {
@@ -50,13 +63,13 @@ export function MessageList({ messages, isLoading, onPromptClick }: MessageListP
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center p-4 bg-white">
+      <div className="flex-1 flex items-center justify-center p-4 bg-white dark:bg-gray-950">
         <div className="w-full max-w-2xl space-y-6">
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-semibold text-gray-900">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
               Weather Chat Agent
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Ask me about weather conditions in any city
             </p>
           </div>
@@ -66,7 +79,7 @@ export function MessageList({ messages, isLoading, onPromptClick }: MessageListP
               <button
                 key={index}
                 onClick={() => onPromptClick?.(prompt)}
-                className="w-full text-left px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 hover:border-gray-300 transition-colors"
+                className="w-full text-left px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
               >
                 {prompt}
               </button>
@@ -81,14 +94,16 @@ export function MessageList({ messages, isLoading, onPromptClick }: MessageListP
     <div
       ref={containerRef}
       onScroll={handleScroll}
-      className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 scroll-smooth bg-white  relative"
+      className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 scroll-smooth bg-white dark:bg-gray-950 relative"
       role="log"
       aria-live="polite"
       aria-label="Chat messages"
     >
       <div className="max-w-4xl mx-auto">
-        {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} onPromptClick={onPromptClick} />
+        {messages.map((message, index) => (
+          <div key={message.id} ref={(el) => { messageRefs.current[index] = el; }}>
+            <MessageBubble message={message} onPromptClick={onPromptClick} searchQuery={searchQuery} />
+          </div>
         ))}
         
         {isLoading && messages[messages.length - 1]?.role === 'user' && (

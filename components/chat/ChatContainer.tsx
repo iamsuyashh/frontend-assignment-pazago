@@ -13,6 +13,7 @@ export function ChatContainer() {
   const [showSearch, setShowSearch] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [isRetrying, setIsRetrying] = useState(false);
+  const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
 
   const handlePromptClick = (prompt: string) => {
     setInputValue(prompt);
@@ -25,8 +26,21 @@ export function ChatContainer() {
       )
     : messages;
 
+  // Handle search navigation
+  const handleSearchNavigate = () => {
+    if (filteredMessages.length > 0) {
+      setCurrentSearchIndex((prev) => (prev + 1) % filteredMessages.length);
+    }
+  };
+
+  // Reset search index when query changes
+  const handleSearchChange = (newQuery: string) => {
+    setSearchQuery(newQuery);
+    setCurrentSearchIndex(0);
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-white dark:bg-gray-950">
       <ChatHeader
         onClear={clearChat}
         onExport={exportChat}
@@ -37,17 +51,19 @@ export function ChatContainer() {
       {showSearch && (
         <SearchBar
           value={searchQuery}
-          onChange={setSearchQuery}
+          onChange={handleSearchChange}
           resultCount={filteredMessages.length}
           totalCount={messages.length}
+          onNavigate={handleSearchNavigate}
+          currentIndex={currentSearchIndex}
         />
       )}
 
       {error && (
-        <div className="mx-3 sm:mx-4 mt-3 sm:mt-4 p-3 sm:p-4 bg-red-50 border-2 border-red-300 rounded-xl shadow-lg animate-slideUp">
+        <div className="mx-3 sm:mx-4 mt-3 sm:mt-4 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-800 rounded-xl shadow-lg animate-slideUp">
           <div className="flex items-start gap-2 sm:gap-3">
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0 mt-0.5"
+              className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -58,7 +74,7 @@ export function ChatContainer() {
               />
             </svg>
             <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm font-semibold text-red-800 break-words">
+              <p className="text-xs sm:text-sm font-semibold text-red-800 dark:text-red-300 break-words">
                 Error: {error}
               </p>
               <button
@@ -71,7 +87,7 @@ export function ChatContainer() {
                   }
                 }}
                 disabled={isRetrying || isLoading}
-                className="mt-2 text-xs sm:text-sm text-red-700 hover:text-red-900 font-semibold underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                className="mt-2 text-xs sm:text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 font-semibold underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               >
                 {isRetrying ? (
                   <>
@@ -94,6 +110,8 @@ export function ChatContainer() {
         messages={filteredMessages} 
         isLoading={isLoading} 
         onPromptClick={handlePromptClick}
+        searchQuery={searchQuery}
+        currentSearchIndex={currentSearchIndex}
       />
 
       <ChatInput 

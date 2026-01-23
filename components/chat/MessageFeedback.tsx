@@ -22,7 +22,7 @@ export function MessageFeedback({ messageId, onFeedback }: MessageFeedbackProps)
 
   if (showThanks) {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-green-600 animate-fadeIn">
+      <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 animate-fadeIn">
         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
         </svg>
@@ -38,8 +38,8 @@ export function MessageFeedback({ messageId, onFeedback }: MessageFeedbackProps)
         disabled={selectedFeedback !== null}
         className={`p-1.5 rounded-md transition-colors ${ 
           selectedFeedback === 'positive' 
-            ? 'text-green-600 bg-green-50' 
-            : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+            ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20' 
+            : 'text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
         } disabled:opacity-50`}
         aria-label="Good response"
         title="Good response"
@@ -54,8 +54,8 @@ export function MessageFeedback({ messageId, onFeedback }: MessageFeedbackProps)
         disabled={selectedFeedback !== null}
         className={`p-1.5 rounded-md transition-colors ${ 
           selectedFeedback === 'negative' 
-            ? 'text-red-600 bg-red-50' 
-            : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+            ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20' 
+            : 'text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
         } disabled:opacity-50`}
         aria-label="Bad response"
         title="Bad response"

@@ -48,9 +48,9 @@ export function ChatInput({ onSend, disabled = false, placeholder = 'Ask about t
   };
 
   return (
-    <div className="bg-white p-3 sm:p-4 animate-slideUp">
+    <div className="bg-white dark:bg-gray-950 p-3 sm:p-4 animate-slideUp">
       <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-end gap-2 bg-white rounded-2xl sm:rounded-3xl border border-gray-200 focus-within:border-blue-400 focus-within:shadow-lg focus-within:shadow-blue-100 transition-all duration-300">
+        <div className="relative flex items-end gap-2 bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-700 focus-within:border-blue-400 dark:focus-within:border-blue-500 focus-within:shadow-lg focus-within:shadow-blue-100 dark:focus-within:shadow-blue-900/20 transition-all duration-300">
           <textarea
             ref={textareaRef}
             value={input}
@@ -59,7 +59,7 @@ export function ChatInput({ onSend, disabled = false, placeholder = 'Ask about t
             
             disabled={disabled}
             rows={1}
-            className="flex-1 bg-transparent px-4 sm:px-6 py-4 sm:py-15 text-gray-900 placeholder-gray-400 resize-none outline-none disabled:opacity-60 disabled:cursor-not-allowed text-sm sm:text-base leading-relaxed transition-all overflow-hidden"
+            className="flex-1 bg-transparent px-4 sm:px-6 py-4 sm:py-15 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none outline-none disabled:opacity-60 disabled:cursor-not-allowed text-sm sm:text-base leading-relaxed transition-all overflow-hidden"
             aria-label="Message input"
             aria-disabled={disabled}
             style={{ maxHeight: '200px', minHeight: '56px' }}
@@ -68,7 +68,7 @@ export function ChatInput({ onSend, disabled = false, placeholder = 'Ask about t
           <button
             onClick={handleSend}
             disabled={disabled || !input.trim()}
-            className="m-2 p-2.5 sm:p-3 rounded-xl bg-black text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 active:scale-95"
+            className="m-2 p-2.5 sm:p-3 rounded-xl bg-black dark:bg-white text-white dark:text-black disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 active:scale-95"
             aria-label="Send message"
             title={disabled ? 'Waiting for response...' : 'Send message (Enter)'}
           >

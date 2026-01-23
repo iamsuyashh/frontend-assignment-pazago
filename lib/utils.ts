@@ -47,6 +47,27 @@ export function generateId(): string {
 }
 
 /**
+ * Highlights search query in text
+ * @param text - The text to search in
+ * @param query - The search query
+ * @returns Array of React nodes with highlighted matches
+ */
+export function highlightText(text: string, query: string): React.ReactNode[] {
+  if (!query.trim()) return [text];
+  
+  const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')})`, 'gi'));
+  
+  return parts.map((part, index) => 
+    part.toLowerCase() === query.toLowerCase() 
+      ? React.createElement('mark', { 
+          key: index, 
+          className: 'bg-yellow-200 dark:bg-yellow-600/50 text-inherit rounded px-0.5' 
+        }, part)
+      : part
+  );
+}
+
+/**
  * Export data as a JSON file download
  * Creates a blob and triggers browser download
  * @param data - The data object to export

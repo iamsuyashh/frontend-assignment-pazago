@@ -3,21 +3,28 @@
 import React, { memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Message } from '@/types/chat';
-import { formatTimestamp, parseLinksInText } from '@/lib/utils';
+import { formatTimestamp, parseLinksInText, highlightText } from '@/lib/utils';
 
 interface MessageBubbleProps {
   message: Message;
   onPromptClick?: (prompt: string) => void;
+  searchQuery?: string;
 }
 
 /**
  * MessageBubble component displays individual chat messages
  * Memoized to prevent unnecessary re-renders when parent updates
  */
-export const MessageBubble = memo(function MessageBubble({ message, onPromptClick }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({ message, onPromptClick, searchQuery = '' }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const isError = message.status === 'error';
   const isAssistant = message.role === 'assistant';
+  
+  // Create a custom text renderer for ReactMarkdown that highlights search terms
+  const HighlightedText = ({ children }: { children: string }) => {
+    if (!searchQuery || !children) return <>{children}</>;
+    return <>{highlightText(children, searchQuery)}</>;
+  };
 
   // Default suggestions for errors only
   const defaultSuggestions = [
@@ -32,10 +39,10 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
         <div
           className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] rounded-2xl px-3.5 sm:px-4 py-2.5 sm:py-3 transition-all ${
             isUser
-              ? 'bg-[#F5F5F5] text-black rounded-br-md'
+              ? 'bg-[#F5F5F5] dark:bg-gray-800 text-black dark:text-gray-100 rounded-br-md'
               : isError
-              ? 'bg-red-50 border border-red-200 text-red-900 rounded-bl-md'
-              : 'text-gray-900 rounded-bl-md'
+              ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-300 rounded-bl-md'
+              : 'text-gray-900 dark:text-gray-100 rounded-bl-md'
           }`}
         >
           <div className="flex flex-col gap-1.5 sm:gap-2">
@@ -48,12 +55,13 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
                     p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                     strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                     em: ({ children }) => <em className="italic">{children}</em>,
+                    text: ({ children }) => <HighlightedText>{String(children)}</HighlightedText>,
                     a: ({ href, children }) => (
                       <a
                         href={href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline underline-offset-2 transition-colors"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline underline-offset-2 transition-colors"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {children}
@@ -63,7 +71,7 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
                     ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
                     li: ({ children }) => <li className="ml-2">{children}</li>,
                     code: ({ children }) => (
-                      <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">
+                      <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-xs font-mono">
                         {children}
                       </code>
                     ),
@@ -73,7 +81,7 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
                 </ReactMarkdown>
               ) : (
                 <span className="whitespace-pre-wrap">
-                  {parseLinksInText(message.content || '')}
+                  {searchQuery ? highlightText(message.content || '', searchQuery) : parseLinksInText(message.content || '')}
                 </span>
               )}
               {message.isStreaming && (
@@ -84,7 +92,7 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
             {/* Timestamp and status */}
             <div
               className={`flex items-center gap-2 text-[10px] sm:text-xs mt-0.5 ${
-                isUser ? 'text-gray-600' : 'text-gray-500'
+                isUser ? 'text-gray-600 dark:text-gray-400' : 'text-gray-500 dark:text-gray-400'
               }`}
             >
               <span className="font-medium">{formatTimestamp(message.timestamp)}</span>
@@ -122,14 +130,14 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
 
               {message.status === 'error' && (
                 <span className="flex items-center gap-1">
-                  <svg className="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-3.5 h-3.5 text-red-500 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       fillRule="evenodd"
                       d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span className="hidden sm:inline text-red-600">Failed</span>
+                  <span className="hidden sm:inline text-red-600 dark:text-red-400">Failed</span>
                 </span>
               )}
             </div>
@@ -145,7 +153,7 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
               <button
                 key={index}
                 onClick={() => onPromptClick(suggestion)}
-                className="px-10 py-5 bg-[#F5F5F5] text-gray-700 text-xs sm:text-sm rounded-xl hover:bg-gray-200 transition-colors border border-gray-200 text-left"
+                className="px-10 py-5 bg-[#F5F5F5] dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700 text-left"
               >
                 {suggestion}
               </button>
@@ -158,12 +166,12 @@ export const MessageBubble = memo(function MessageBubble({ message, onPromptClic
       {isError && onPromptClick && (
         <div className="flex justify-start mb-3 sm:mb-4 animate-fadeIn">
           <div className="max-w-[85%] sm:max-w-[75%] md:max-w-[70%] flex flex-col gap-2">
-            <p className="text-xs text-gray-600 mb-1 px-2">Try asking about these cities:</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 px-2">Try asking about these cities:</p>
             {defaultSuggestions.map((suggestion, index) => (
               <button
                 key={index}
                 onClick={() => onPromptClick(suggestion)}
-                className="px-4 py-3 bg-white text-gray-700 text-xs sm:text-sm rounded-xl hover:bg-gray-50 transition-colors border border-gray-200 text-left"
+                className="px-4 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700 text-left"
               >
                 {suggestion}
               </button>
