@@ -1,4 +1,5 @@
 import React from 'react';
+import { jsPDF } from 'jspdf';
 
 /**
  * Combines class names into a single string, filtering out falsy values
@@ -62,6 +63,86 @@ export function exportToJSON(data: unknown, filename: string): void {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+/**
+ * Export chat messages as a formatted PDF file
+ * Creates a professional-looking PDF with proper formatting
+ * @param data - The chat export data containing messages
+ * @param filename - Name for the downloaded PDF file
+ */
+export function exportToPDF(data: { threadId: string; exportedAt: string; messages: Array<{ role: string; content: string; timestamp: string }> }, filename: string): void {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.width;
+  const pageHeight = doc.internal.pageSize.height;
+  const margin = 20;
+  const maxWidth = pageWidth - (margin * 2);
+  let currentY = margin;
+  
+  // Add title
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Chat Export', pageWidth / 2, currentY, { align: 'center' });
+  currentY += 20;
+  
+  // Add export info
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Thread ID: ${data.threadId}`, margin, currentY);
+  currentY += 8;
+  doc.text(`Exported: ${new Date(data.exportedAt).toLocaleString()}`, margin, currentY);
+  currentY += 20;
+  
+  // Process each message
+  data.messages.forEach((message) => {
+    const isUser = message.role === 'user';
+    
+    // Check if we need a new page
+    if (currentY > pageHeight - 60) {
+      doc.addPage();
+      currentY = margin;
+    }
+    
+    // Message header
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    const roleText = isUser ? 'You' : 'Assistant';
+    const timeText = new Date(message.timestamp).toLocaleString();
+    
+    doc.text(roleText, margin, currentY);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(timeText, pageWidth - margin, currentY, { align: 'right' });
+    currentY += 12;
+    
+    // Message content
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    
+    // Split long messages into multiple lines
+    const lines = doc.splitTextToSize(message.content, maxWidth - 10);
+    
+    lines.forEach((line: string) => {
+      if (currentY > pageHeight - 30) {
+        doc.addPage();
+        currentY = margin;
+      }
+      
+      if (isUser) {
+        // User messages aligned to the right
+        doc.text(line, pageWidth - margin - 10, currentY, { align: 'right' });
+      } else {
+        // Assistant messages aligned to the left
+        doc.text(line, margin + 10, currentY);
+      }
+      currentY += 6;
+    });
+    
+    currentY += 10; // Space between messages
+  });
+  
+  // Save the PDF
+  doc.save(filename);
 }
 
 /**

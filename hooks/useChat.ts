@@ -3,9 +3,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Message, UseChatReturn } from '@/types/chat';
 import { STORAGE_KEYS } from '@/lib/constants';
-import { generateId, exportToJSON, playNotificationSound, extractSuggestionsFromText } from '@/lib/utils';
+import { generateId, exportToPDF, playNotificationSound, extractSuggestionsFromText } from '@/lib/utils';
 
-const THREAD_ID = '231255'; // Replace with actual roll number
+// Get thread ID from environment variable
+const THREAD_ID = process.env.NEXT_PUBLIC_THREAD_ID || 'default';
 
 export function useChat(): UseChatReturn {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -96,7 +97,7 @@ export function useChat(): UseChatReturn {
               
               console.log('SSE Event:', data.type);
               
-            } catch (parseError) {
+            } catch {
               if (line.includes('"type":"done"')) {
                 console.log('Stream done event received');
               }
@@ -289,8 +290,8 @@ export function useChat(): UseChatReturn {
       }))
     };
     
-    const filename = `weather-chat-${new Date().toISOString().split('T')[0]}.json`;
-    exportToJSON(exportData, filename);
+    const filename = `weather-chat-${new Date().toISOString().split('T')[0]}.pdf`;
+    exportToPDF(exportData, filename);
   }, [messages]);
 
   const retryLastMessage = useCallback(async () => {
